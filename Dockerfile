@@ -1,37 +1,37 @@
 # Notification Library — multi-stage build
 #
-# Documentación: README, sección Docker (uso completo y ejecución en otra máquina).
+# Documentation: README, Docker section (full usage and running on another machine).
 #
-# Prerequisito: Docker instalado y daemon en ejecución (p. ej. Docker Desktop abierto).
+# Prerequisite: Docker installed and daemon running (e.g. Docker Desktop open).
 #
-# Qué hace: Stage 1 compila con Maven (JDK 21) y genera un fat JAR (maven-shade-plugin)
-# con Main-Class = NotificationExamples. Stage 2 es la imagen final: solo JRE 21 + ese JAR.
-# No necesitas Java ni Maven en tu máquina; todo ocurre dentro del contenedor de build.
+# What it does: Stage 1 compiles with Maven (JDK 21) and produces a fat JAR (maven-shade-plugin)
+# with Main-Class = NotificationExamples. Stage 2 is the final image: JRE 21 only + that JAR.
+# You don't need Java or Maven on your machine; everything runs inside the build container.
 #
-# Uso (desde la raíz del proyecto; el "." es la carpeta actual = contexto de build):
-#   1. Construir la imagen:
+# Usage (from project root; "." is the current folder = build context):
+#   1. Build the image:
 #      docker build -t notification-library .
-#   2. Ejecutar los demos (salida de NotificationExamples en consola):
+#   2. Run the demos (NotificationExamples output to console):
 #      docker run --rm notification-library
 #
-# -t notification-library  → nombre de la imagen.
-# --rm                     → elimina el contenedor al terminar.
+# -t notification-library  → image name.
+# --rm                     → remove the container when it exits.
 
-# --- Stage 1: build (no queda en la imagen final) ---
+# --- Stage 1: build (not included in final image) ---
 FROM eclipse-temurin:21-jdk-alpine AS build
 
 WORKDIR /app
 
 RUN apk add --no-cache maven
 
-# Caché de capas: dependencias aparte; solo se recompila si cambian pom o src
+# Layer cache: dependencies separate; only recompiles if pom or src change
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# --- Stage 2: runtime (imagen final: solo JRE + JAR) ---
+# --- Stage 2: runtime (final image: JRE + JAR only) ---
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app

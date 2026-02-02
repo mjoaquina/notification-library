@@ -1,30 +1,30 @@
 # Notifications Library
 
-Librería de notificaciones en Java agnóstica a frameworks y extensible. Soporta múltiples canales (Email, SMS, Push) con diferentes proveedores, sistema de reintentos configurable, envío asíncrono y patrón Pub/Sub para eventos.
+Java notification library, framework-agnostic and extensible. Supports multiple channels (Email, SMS, Push) with different providers, configurable retry system, asynchronous sending, and Pub/Sub pattern for events.
 
-## Características
+## Features
 
-- ✅ **3 Canales**: Email, SMS, Push Notifications
-- ✅ **6 Proveedores**: SendGrid, Mailgun, Twilio, AWS SNS, FCM, OneSignal
-- ✅ **Sistema de Reintentos**: Configurable con backoff exponencial
-- ✅ **Envío Asíncrono**: Soporte con CompletableFuture
-- ✅ **Pub/Sub Pattern**: Eventos para seguimiento de notificaciones
-- ✅ **Arquitectura Extensible**: Fácil agregar nuevos canales/proveedores
-- ✅ **Principios SOLID**: Diseño limpio y mantenible
-- ✅ **Tests Unitarios**: Cobertura completa con JUnit 5 y Mockito
+- ✅ **3 Channels**: Email, SMS, Push Notifications
+- ✅ **6 Providers**: SendGrid, Mailgun, Twilio, AWS SNS, FCM, OneSignal
+- ✅ **Retry System**: Configurable with exponential backoff
+- ✅ **Asynchronous Sending**: Support with CompletableFuture
+- ✅ **Pub/Sub Pattern**: Events for notification tracking
+- ✅ **Extensible Architecture**: Easy to add new channels/providers
+- ✅ **SOLID Principles**: Clean and maintainable design
+- ✅ **Unit Tests**: Full coverage with JUnit 5 and Mockito
 
-## Requisitos
+## Requirements
 
-- Java 21 o superior
+- Java 21 or higher
 - Maven 3.6+
 
-Para ejecutar solo los demos sin instalar Java ni Maven: **Docker** (ver sección [Docker](#docker)).
+To run the demos only without installing Java or Maven: **Docker** (see [Docker](#docker) section).
 
-## Instalación
+## Installation
 
 ### Maven
 
-Agrega la dependencia a tu `pom.xml`:
+Add the dependency to your `pom.xml`:
 
 ```xml
 <dependency>
@@ -34,7 +34,7 @@ Agrega la dependencia a tu `pom.xml`:
 </dependency>
 ```
 
-**Compilación local (desarrollo):**
+**Local build (development):**
 
 ```bash
 mvn clean install
@@ -42,7 +42,7 @@ mvn clean install
 
 ### Gradle
 
-Agrega la dependencia en tu `build.gradle` (Groovy) o `build.gradle.kts` (Kotlin DSL):
+Add the dependency in your `build.gradle` (Groovy) or `build.gradle.kts` (Kotlin DSL):
 
 **Groovy:**
 ```groovy
@@ -58,11 +58,11 @@ dependencies {
 }
 ```
 
-**Compilación local:** Publica en el repositorio local con Maven (`mvn clean install`) y Gradle resolverá la dependencia desde allí, o configura un repositorio Maven local en tu `settings.gradle`.
+**Local build:** Publish to the local repository with Maven (`mvn clean install`) and Gradle will resolve the dependency from there, or configure a local Maven repository in your `settings.gradle`.
 
 ## Quick Start
 
-### Ejemplo básico (Email con SendGrid)
+### Basic example (Email with SendGrid)
 
 ```java
 var emailChannel = ChannelFactory.createChannel(
@@ -82,12 +82,12 @@ try (var service = NotificationServiceBuilder.builder()
 
     NotificationResult result = service.send(request);
     if (result.isSuccess()) {
-        System.out.println("¡Enviado!");
+        System.out.println("Sent!");
     }
 }
 ```
 
-### Ejemplo asíncrono (SMS con Twilio)
+### Asynchronous example (SMS with Twilio)
 
 ```java
 var smsChannel = ChannelFactory.createChannel(
@@ -105,7 +105,7 @@ try (var service = NotificationServiceBuilder.builder()
 
     CompletableFuture<NotificationResult> future = service.sendAsync(request);
     future.thenAccept(result -> {
-        if (result.isSuccess()) System.out.println("Enviado!");
+        if (result.isSuccess()) System.out.println("Sent!");
     }).exceptionally(e -> {
         System.out.println("Error: " + e.getMessage());
         return null;
@@ -114,7 +114,7 @@ try (var service = NotificationServiceBuilder.builder()
 }
 ```
 
-### Ejemplo con eventos (Pub/Sub)
+### Example with events (Pub/Sub)
 
 ```java
 var pushChannel = ChannelFactory.createChannel(Channel.PUSH, "FCM", "your-fcm-key");
@@ -124,27 +124,27 @@ try (var service = NotificationServiceBuilder.builder()
         .build()) {
 
     service.subscribe(event -> {
-        System.out.println("Evento: " + event.getStatus() + " ID: " + event.getNotificationId());
+        System.out.println("Event: " + event.getStatus() + " ID: " + event.getNotificationId());
     });
 
     service.send(request);
 }
 ```
 
-> **Importante:** `NotificationService` implementa `AutoCloseable`. Usa `try-with-resources` o llama a `service.shutdown()` al finalizar para liberar recursos (p. ej. ExecutorService en modo async).
+> **Important:** `NotificationService` implements `AutoCloseable`. Use `try-with-resources` or call `service.shutdown()` when done to release resources (e.g. ExecutorService in async mode).
 
-## Configuración
+## Configuration
 
-Los canales se crean con **ChannelFactory.createChannel(tipo, proveedor, config...)** y se registran en el servicio con **NotificationServiceBuilder.registerChannel()**. El orden de `config` depende del proveedor.
+Channels are created with **ChannelFactory.createChannel(type, provider, config...)** and registered with the service via **NotificationServiceBuilder.registerChannel()**. The order of `config` depends on the provider.
 
 ### Email
 
-| Proveedor | Llamada | Parámetros `config` |
-|-----------|---------|---------------------|
+| Provider | Call | `config` parameters |
+|----------|------|---------------------|
 | SendGrid  | `ChannelFactory.createChannel(Channel.EMAIL, "SendGrid", apiKey, fromEmail, fromName)` | apiKey, fromEmail, fromName |
 | Mailgun   | `ChannelFactory.createChannel(Channel.EMAIL, "Mailgun", apiKey, fromEmail, fromName)` | apiKey, fromEmail, fromName |
 
-**Ejemplo SendGrid:**
+**SendGrid example:**
 
 ```java
 var emailChannel = ChannelFactory.createChannel(
@@ -158,7 +158,7 @@ NotificationService service = NotificationServiceBuilder.builder()
     .build();
 ```
 
-**Ejemplo Mailgun:**
+**Mailgun example:**
 
 ```java
 var emailChannel = ChannelFactory.createChannel(
@@ -172,12 +172,12 @@ NotificationService service = NotificationServiceBuilder.builder()
 
 ### SMS
 
-| Proveedor | Llamada | Parámetros `config` |
-|-----------|---------|---------------------|
+| Provider | Call | `config` parameters |
+|----------|------|---------------------|
 | Twilio    | `ChannelFactory.createChannel(Channel.SMS, "Twilio", accountSid, authToken, fromNumber)` | accountSid, authToken, fromNumber |
 | AWS SNS   | `ChannelFactory.createChannel(Channel.SMS, "AwsSns", apiKey, apiSecret, region)` | apiKey, apiSecret, region |
 
-**Ejemplo Twilio:**
+**Twilio example:**
 
 ```java
 var smsChannel = ChannelFactory.createChannel(
@@ -189,7 +189,7 @@ NotificationService service = NotificationServiceBuilder.builder()
     .build();
 ```
 
-**Ejemplo AWS SNS:**
+**AWS SNS example:**
 
 ```java
 var smsChannel = ChannelFactory.createChannel(
@@ -203,12 +203,12 @@ NotificationService service = NotificationServiceBuilder.builder()
 
 ### Push
 
-| Proveedor | Llamada | Parámetros `config` |
-|-----------|---------|---------------------|
+| Provider | Call | `config` parameters |
+|----------|------|---------------------|
 | FCM       | `ChannelFactory.createChannel(Channel.PUSH, "FCM", serverKey)` | serverKey |
 | OneSignal | `ChannelFactory.createChannel(Channel.PUSH, "OneSignal", apiKey, appId)` | apiKey, appId |
 
-**Ejemplo FCM:**
+**FCM example:**
 
 ```java
 var pushChannel = ChannelFactory.createChannel(Channel.PUSH, "FCM", "your-fcm-server-key");
@@ -218,7 +218,7 @@ NotificationService service = NotificationServiceBuilder.builder()
     .build();
 ```
 
-**Ejemplo OneSignal:**
+**OneSignal example:**
 
 ```java
 var pushChannel = ChannelFactory.createChannel(
@@ -229,9 +229,9 @@ NotificationService service = NotificationServiceBuilder.builder()
     .build();
 ```
 
-## Sistema de Reintentos
+## Retry System
 
-### Configuración de Reintentos
+### Retry Configuration
 
 ```java
 RetryConfig retryConfig = RetryConfig.builder()
@@ -251,19 +251,19 @@ NotificationService service = NotificationServiceBuilder.builder()
     .build();
 ```
 
-### Backoff Exponencial
+### Exponential Backoff
 
-El sistema usa backoff exponencial:
-- Intento 1: Sin delay
-- Intento 2: `initialDelayMs` (ej: 1000ms)
-- Intento 3: `initialDelayMs * multiplier` (ej: 2000ms)
-- Intento 4: `initialDelayMs * multiplier^2` (ej: 4000ms)
-- El delay se limita a `maxDelayMs`
+The system uses exponential backoff:
+- Attempt 1: No delay
+- Attempt 2: `initialDelayMs` (e.g. 1000ms)
+- Attempt 3: `initialDelayMs * multiplier` (e.g. 2000ms)
+- Attempt 4: `initialDelayMs * multiplier^2` (e.g. 4000ms)
+- Delay is capped at `maxDelayMs`
 
-## Proveedores Soportados
+## Supported Providers
 
-| Canal | Proveedor | API |
-|-------|-----------|-----|
+| Channel | Provider | API |
+|---------|----------|-----|
 | Email | SendGrid | API v3 Mail Send |
 | Email | Mailgun | Messages API |
 | SMS | Twilio | Messages API |
@@ -271,13 +271,13 @@ El sistema usa backoff exponencial:
 | Push | Firebase Cloud Messaging (FCM) | v1 Send API |
 | Push | OneSignal | Create Notification API |
 
-## Guía de Extensión
+## Extension Guide
 
-### Agregar un nuevo proveedor
+### Adding a new provider
 
-1. **Implementar el proveedor** (igual que antes: `NotificationProvider` + lógica de envío).
+1. **Implement the provider** (same as before: `NotificationProvider` + send logic).
 
-2. **Implementar `ChannelFactoryInterface`** y registrar en el registry:
+2. **Implement `ChannelFactoryInterface`** and register it in the registry:
 
 ```java
 public class NewEmailChannelFactory implements ChannelFactoryInterface {
@@ -295,64 +295,64 @@ public class NewEmailChannelFactory implements ChannelFactoryInterface {
     public String getChannelType() { return Channel.EMAIL.name(); }
 }
 
-// Al arranque de la app (o en un módulo de configuración):
+// At application startup (or in a configuration module):
 ChannelFactory.getRegistry().register(new NewEmailChannelFactory());
 ```
 
-3. **Uso:** `ChannelFactory.createChannel(Channel.EMAIL, "NewProvider", apiKey, fromEmail, fromName)` y `NotificationServiceBuilder.builder().registerChannel(channel).build()`.
+3. **Usage:** `ChannelFactory.createChannel(Channel.EMAIL, "NewProvider", apiKey, fromEmail, fromName)` and `NotificationServiceBuilder.builder().registerChannel(channel).build()`.
 
-### Agregar un nuevo canal
+### Adding a new channel
 
-1. Crear la clase del canal implementando `NotificationChannel` (y opcionalmente `RetryableChannel`).
-2. Añadir el valor al enum `Channel` (EMAIL, SMS, PUSH, …).
-3. Crear un `ChannelFactoryInterface` para ese canal y registrarlo en `ChannelFactory.getRegistry()`.
-4. Usar `ChannelFactory.createChannel(Channel.NUEVO_CANAL, "NombreProveedor", ...)` y `registerChannel()`.
+1. Create the channel class implementing `NotificationChannel` (and optionally `RetryableChannel`).
+2. Add the value to the `Channel` enum (EMAIL, SMS, PUSH, …).
+3. Create a `ChannelFactoryInterface` for that channel and register it in `ChannelFactory.getRegistry()`.
+4. Use `ChannelFactory.createChannel(Channel.NEW_CHANNEL, "ProviderName", ...)` and `registerChannel()`.
 
 ## API Reference
 
-### Clases principales
+### Main classes
 
-| Clase | Uso |
-|-------|-----|
-| **ChannelFactory** | Crear canales: `createChannel(Channel tipo, String proveedor, String... config)`. Registry: `getRegistry().register(ChannelFactoryInterface)`. |
-| **NotificationServiceBuilder** | Construir el servicio: `builder()`, `registerChannel(NotificationChannel)`, `retryConfig(RetryConfig)`, `executionMode(SYNC\|ASYNC)` o `sync()`/`async()`, `build()`. |
-| **NotificationService** | Enviar y suscribirse: `send(request)`, `sendAsync(request)`, `subscribe(Consumer<NotificationEvent>)`, `shutdown()`/`close()`. |
-| **NotificationRequest** | DTO de petición: `builder().channel(...).recipient(...).subject(...).message(...).title(...).body(...).build()`. |
-| **NotificationResult** | Resultado: `isSuccess()`, `getStatus()`, `getProviderName()`, `getAttemptNumber()`, `getTimestamp()`, `getErrorDetails()`. |
-| **NotificationEvent** | Eventos Pub/Sub: PENDING, RETRYING, SENT, FAILED. |
+| Class | Usage |
+|-------|-------|
+| **ChannelFactory** | Create channels: `createChannel(Channel type, String provider, String... config)`. Registry: `getRegistry().register(ChannelFactoryInterface)`. |
+| **NotificationServiceBuilder** | Build the service: `builder()`, `registerChannel(NotificationChannel)`, `retryConfig(RetryConfig)`, `executionMode(SYNC\|ASYNC)` or `sync()`/`async()`, `build()`. |
+| **NotificationService** | Send and subscribe: `send(request)`, `sendAsync(request)`, `subscribe(Consumer<NotificationEvent>)`, `shutdown()`/`close()`. |
+| **NotificationRequest** | Request DTO: `builder().channel(...).recipient(...).subject(...).message(...).title(...).body(...).build()`. |
+| **NotificationResult** | Result: `isSuccess()`, `getStatus()`, `getProviderName()`, `getAttemptNumber()`, `getTimestamp()`, `getErrorDetails()`. |
+| **NotificationEvent** | Pub/Sub events: PENDING, RETRYING, SENT, FAILED. |
 
 ### NotificationServiceBuilder
 
-- **`static builder()`** — Crea el builder.
-- **`registerChannel(NotificationChannel channel)`** — Registra un canal (creado con `ChannelFactory.createChannel(...)`). Retorna `this`.
-- **`retryConfig(RetryConfig config)`** — Aplica reintentos a canales que implementan `RetryableChannel`. Retorna `this`.
-- **`executionMode(ExecutionMode mode)`** — SYNC (sin thread pool) o ASYNC (por defecto). Retorna `this`.
-- **`sync()`** / **`async()`** — Atajos para el modo de ejecución. Retornan `this`.
-- **`build()`** — Construye `NotificationService` (Sync o Async) con los canales registrados.
+- **`static builder()`** — Creates the builder.
+- **`registerChannel(NotificationChannel channel)`** — Registers a channel (created with `ChannelFactory.createChannel(...)`). Returns `this`.
+- **`retryConfig(RetryConfig config)`** — Applies retries to channels that implement `RetryableChannel`. Returns `this`.
+- **`executionMode(ExecutionMode mode)`** — SYNC (no thread pool) or ASYNC (default). Returns `this`.
+- **`sync()`** / **`async()`** — Shortcuts for execution mode. Return `this`.
+- **`build()`** — Builds `NotificationService` (Sync or Async) with the registered channels.
 
 ### ChannelFactory
 
-- **`createChannel(Channel channelType, String providerName, String... config)`** — Crea un canal. El orden de `config` depende del proveedor (ver tablas en Configuración).
-- **`getRegistry()`** — Devuelve el registry para registrar factories custom (`ChannelFactoryInterface`).
+- **`createChannel(Channel channelType, String providerName, String... config)`** — Creates a channel. The order of `config` depends on the provider (see tables in Configuration).
+- **`getRegistry()`** — Returns the registry to register custom factories (`ChannelFactoryInterface`).
 
 ### NotificationService
 
 #### `send(NotificationRequest request)`
-Envía una notificación de forma síncrona.
+Sends a notification synchronously.
 
-**Parámetros:** `request` — Solicitud de notificación.  
-**Retorna:** `NotificationResult`.
+**Parameters:** `request` — Notification request.  
+**Returns:** `NotificationResult`.
 
 #### `sendAsync(NotificationRequest request)`
-Envía una notificación de forma asíncrona.
+Sends a notification asynchronously.
 
-**Parámetros:** `request` — Solicitud de notificación.  
-**Retorna:** `CompletableFuture<NotificationResult>`.
+**Parameters:** `request` — Notification request.  
+**Returns:** `CompletableFuture<NotificationResult>`.
 
 #### `subscribe(Consumer<NotificationEvent> eventConsumer)`
-Suscribe un consumidor a eventos de notificaciones.
+Subscribes a consumer to notification events.
 
-**Parámetros:** `eventConsumer` — Consumidor de eventos.
+**Parameters:** `eventConsumer` — Event consumer.
 
 ### NotificationRequest
 
@@ -360,10 +360,10 @@ Suscribe un consumidor a eventos de notificaciones.
 NotificationRequest.builder()
     .channel(Channel.EMAIL)
     .recipient("user@example.com")
-    .subject("Subject")           // Para email
+    .subject("Subject")           // For email
     .message("Message body")
-    .title("Title")              // Para push
-    .body("Body")                // Para push
+    .title("Title")              // For push
+    .body("Body")                // For push
     .build();
 ```
 
@@ -382,30 +382,30 @@ result.getErrorDetails();        // String
 
 ### NotificationEvent
 
-Eventos publicados durante el ciclo de vida de la notificación:
+Events published during the notification lifecycle:
 
-- `PENDING`: Notificación encolada
-- `RETRYING`: Notificación siendo reintentada
-- `SENT`: Notificación enviada exitosamente
-- `FAILED`: Notificación falló después de todos los reintentos
+- `PENDING`: Notification queued
+- `RETRYING`: Notification being retried
+- `SENT`: Notification sent successfully
+- `FAILED`: Notification failed after all retries
 
-### Gestión de Recursos
+### Resource Management
 
-`NotificationService` implementa `AutoCloseable`:
+`NotificationService` implements `AutoCloseable`:
 
 #### `shutdown()`
-Cierra el ExecutorService y libera recursos. Seguro llamar múltiples veces.
+Closes the ExecutorService and releases resources. Safe to call multiple times.
 
 #### `close()`
-Equivalente a `shutdown()`. Se invoca automáticamente con `try-with-resources`.
+Equivalent to `shutdown()`. Invoked automatically with `try-with-resources`.
 
 ```java
-// Opción 1: try-with-resources (recomendado)
+// Option 1: try-with-resources (recommended)
 try (NotificationService service = NotificationServiceBuilder.builder()...build()) {
     service.send(request);
 }
 
-// Opción 2: shutdown explícito
+// Option 2: explicit shutdown
 NotificationService service = NotificationServiceBuilder.builder()...build();
 try {
     service.send(request);
@@ -414,9 +414,9 @@ try {
 }
 ```
 
-## Manejo de Errores
+## Error Handling
 
-- **`send()`**: Lanza `RuntimeException` si falla. Captura con try-catch:
+- **`send()`**: Throws `RuntimeException` on failure. Catch with try-catch:
 
 ```java
 try {
@@ -425,42 +425,42 @@ try {
         System.out.println("Error: " + result.getErrorDetails());
     }
 } catch (Exception e) {
-    System.err.println("Error enviando: " + e.getMessage());
+    System.err.println("Error sending: " + e.getMessage());
 }
 ```
 
-- **`sendAsync()`**: Retorna `CompletableFuture`. Usa `exceptionally()` o `handle()` para errores:
+- **`sendAsync()`**: Returns `CompletableFuture`. Use `exceptionally()` or `handle()` for errors:
 
 ```java
 service.sendAsync(request)
-    .thenAccept(result -> { /* éxito */ })
+    .thenAccept(result -> { /* success */ })
     .exceptionally(e -> {
         System.err.println("Error: " + e.getCause().getMessage());
         return null;
     });
 ```
 
-- **`ProviderException`**, **`ValidationException`**: Excepciones específicas del dominio.
+- **`ProviderException`**, **`ValidationException`**: Domain-specific exceptions.
 
-## Seguridad: Mejores prácticas para credenciales
+## Security: Best practices for credentials
 
-1. **Nunca hardcodees credenciales**:
+1. **Never hardcode credentials**:
    ```java
-   // ❌ MAL
+   // ❌ BAD
    ChannelFactory.createChannel(Channel.EMAIL, "SendGrid", "hardcoded-key", ...);
 
-   // ✅ BIEN
+   // ✅ GOOD
    String apiKey = System.getenv("SENDGRID_API_KEY");
    ChannelFactory.createChannel(Channel.EMAIL, "SendGrid", apiKey, fromEmail, fromName);
    ```
 
-2. **Usa variables de entorno**:
+2. **Use environment variables**:
    ```bash
    export SENDGRID_API_KEY="SG.your-key"
    export TWILIO_AUTH_TOKEN="your-token"
    ```
 
-3. **Valida credenciales antes de usar**:
+3. **Validate credentials before use**:
    ```java
    String apiKey = System.getenv("SENDGRID_API_KEY");
    if (apiKey == null || apiKey.isBlank()) {
@@ -469,59 +469,59 @@ service.sendAsync(request)
    var channel = ChannelFactory.createChannel(Channel.EMAIL, "SendGrid", apiKey, from, name);
    ```
 
-4. **Usa secretos gestionados**:
+4. **Use managed secrets**:
    - AWS Secrets Manager
    - HashiCorp Vault
    - Kubernetes Secrets
 
-5. **Rotación de credenciales**:
-   - Implementa rotación periódica
-   - Usa múltiples credenciales para alta disponibilidad
+5. **Credential rotation**:
+   - Implement periodic rotation
+   - Use multiple credentials for high availability
 
-## Ejecutar Ejemplos
+## Running Examples
 
-El build genera un fat JAR (maven-shade-plugin) con `Main-Class: com.agora.notification.examples.NotificationExamples`.
+The build produces a fat JAR (maven-shade-plugin) with `Main-Class: com.agora.notification.examples.NotificationExamples`.
 
 ```bash
 mvn clean package -DskipTests
 
-# Opción 1: ejecutar el JAR (recomendado)
+# Option 1: run the JAR (recommended)
 java -jar target/notification-library-1.0.0.jar
 
-# Opción 2: con Maven
+# Option 2: with Maven
 mvn exec:java -Dexec.mainClass="com.agora.notification.examples.NotificationExamples" -DskipTests
 ```
 
 ## Docker
 
-El **`Dockerfile`** en la raíz del proyecto define la imagen; los mismos comandos están en la cabecera del Dockerfile. Esta sección resume el uso y cómo llevar la imagen a otra máquina.
+The **`Dockerfile`** in the project root defines the image; the same commands are in the Dockerfile header. This section summarizes usage and how to move the image to another machine.
 
-Multi-stage build: stage 1 compila con Maven (JDK 21) y genera el fat JAR; stage 2 expone solo el JAR sobre JRE 21. No requiere Java ni Maven en el host.
+Multi-stage build: stage 1 compiles with Maven (JDK 21) and produces the fat JAR; stage 2 exposes only the JAR on JRE 21. No Java or Maven required on the host.
 
-**Prerequisito:** Docker instalado y daemon en ejecución.
+**Prerequisite:** Docker installed and daemon running.
 
-**Desde la raíz del proyecto** (donde está el `Dockerfile`):
+**From the project root** (where the `Dockerfile` is):
 
 ```bash
 docker build -t notification-library .
 docker run --rm notification-library
 ```
 
-El JAR incluye dependencias (shade) y `Main-Class`; el `CMD` ejecuta los ejemplos. Para ejecutar en otra máquina sin clonar: `docker save -o notification-library.tar notification-library:latest`, copiar el `.tar` y en la otra PC `docker load -i notification-library.tar` y `docker run --rm notification-library`; o subir la imagen a un registry (p. ej. Docker Hub) y hacer `docker run` desde allí.
+The JAR includes dependencies (shade) and `Main-Class`; the `CMD` runs the examples. To run on another machine without cloning: `docker save -o notification-library.tar notification-library:latest`, copy the `.tar` file and on the other machine run `docker load -i notification-library.tar` and `docker run --rm notification-library`; or push the image to a registry (e.g. Docker Hub) and run `docker run` from there.
 
 ## Testing
 
-Tests unitarios con JUnit 5 + Mockito, usando mocks y simulaciones (sin conexiones HTTP reales).
+Unit tests with JUnit 5 + Mockito, using mocks and simulations (no real HTTP connections).
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 mvn test
 
-# Ejecutar test específico
+# Run specific test
 mvn test -Dtest=EmailValidatorTest
 ```
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 notification-library/
@@ -529,46 +529,46 @@ notification-library/
 │   ├── main/
 │   │   └── java/
 │   │       └── com/agora/notification/
-│   │           ├── channels/          # Canales (Email, SMS, Push)
-│   │           ├── config/            # Configuraciones
-│   │           ├── core/              # Interfaces core
+│   │           ├── channels/          # Channels (Email, SMS, Push)
+│   │           ├── config/            # Configuration
+│   │           ├── core/              # Core interfaces
 │   │           ├── events/            # Pub/Sub
-│   │           ├── exceptions/        # Excepciones custom
+│   │           ├── exceptions/        # Custom exceptions
 │   │           ├── factory/           # Factory pattern
-│   │           ├── models/            # DTOs y modelos
-│   │           ├── providers/         # Proveedores
-│   │           ├── retry/             # Sistema de reintentos
-│   │           ├── service/           # Servicios
-│   │           └── validation/        # Validadores
+│   │           ├── models/            # DTOs and models
+│   │           ├── providers/         # Providers
+│   │           ├── retry/             # Retry system
+│   │           ├── service/           # Services
+│   │           └── validation/        # Validators
 │   ├── test/
-│   │   └── java/                      # Tests unitarios
+│   │   └── java/                      # Unit tests
 │   └── examples/
-│       └── java/                      # Ejemplos de uso
+│       └── java/                      # Usage examples
 ├── pom.xml
 ├── Dockerfile
 └── README.md
 ```
 
-## Contribuir
+## Contributing
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+1. Fork the project
+2. Create a branch for your feature (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## Licencia
+## License
 
-Este proyecto es parte de un challenge técnico.
+This project is part of a technical challenge.
 
 ---
 
-## Uso de IA
+## AI Usage
 
-> *Completa esta sección si utilizaste herramientas de IA durante el desarrollo (GitHub Copilot, ChatGPT, Claude, Cursor, etc.):*
+> *Complete this section if you used AI tools during development (GitHub Copilot, ChatGPT, Claude, Cursor, etc.):*
 >
-> - **Herramienta/modelo utilizado:** Cursor AI, Claude.
-> - **Proceso de trabajo:** Desarrollo iterativo en 7 fases con revisión manual entre cada paso. Generación de código supervisada: interfaces core → canales → providers → async/retry → tests → documentación. Cada componente fue revisado y ajustado antes de continuar.
-> - **Prompts o estrategias:** Referencias contextuales con @archivo para coherencia arquitectónica. Prompts estructurados en .cursorrules con reglas de patrones (Strategy, Factory, etc.), principios SOLID con ejemplos, y estándares de código (Lombok, inmutabilidad). Validación contra requirements del challenge en cada iteración. Ejemplo de prompt: "Implementar EmailChannel siguiendo Strategy pattern. Contexto: @requirements.txt, sin Spring, configuración por código Java puro. Validar Open/Closed Principle"
-> - **Decisiones propias vs sugerencias de IA:** Propias: arquitectura, diseño de la librería, priorización de features (Async, Retry, Validaciones, Pub/Sub), trade-offs de simplicidad vs completitud. IA: Boilerplate (builders, DTOs, Lombok), implementación de providers basada en docs reales de APIs, estructura de tests con Mockito, README inicial y Dockerfile multi-stage, validaciones con regex.
-> - **En qué ayudó y en qué no:** Ayudó en documentación clara, cobertura de tests, Dockerfile multi-stage y validación contra requirements. No sustituye decisiones decisiones arquitectónicas y evaluación de trade-offs, interpretación del contexto del challenge (qué es suficiente vs overkill), diseño de flujos de integración complejos, identificación de edge cases específicos del dominio.
+> - **Tool/model used:** Cursor AI, Claude.
+> - **Workflow:** Iterative development in 7 phases with manual review between each step. Supervised code generation: core interfaces → channels → providers → async/retry → tests → documentation. Each component was reviewed and adjusted before continuing.
+> - **Prompts or strategies:** Context references with @file for architectural consistency. Structured prompts in .cursorrules with pattern rules (Strategy, Factory, etc.), SOLID principles with examples, and code standards (Lombok, immutability). Validation against challenge requirements at each iteration. Example prompt: "Implement EmailChannel following Strategy pattern. Context: @requirements.txt, no Spring, pure Java code configuration. Validate Open/Closed Principle"
+> - **Own decisions vs AI suggestions:** Own: architecture, library design, feature prioritization (Async, Retry, Validations, Pub/Sub), simplicity vs completeness trade-offs. AI: Boilerplate (builders, DTOs, Lombok), provider implementation based on real API docs, test structure with Mockito, initial README and multi-stage Dockerfile, regex validations.
+> - **What helped and what didn't:** Helped with clear documentation, test coverage, multi-stage Dockerfile and validation against requirements. Does not replace architectural decisions and trade-off evaluation, interpretation of challenge context (what is enough vs overkill), design of complex integration flows, identification of domain-specific edge cases.
