@@ -2,17 +2,6 @@
 
 Java notification library, framework-agnostic and extensible. Supports multiple channels (Email, SMS, Push) with different providers, configurable retry system, asynchronous sending, and Pub/Sub pattern for events.
 
-## Features
-
-- ✅ **3 Channels**: Email, SMS, Push Notifications
-- ✅ **6 Providers**: SendGrid, Mailgun, Twilio, AWS SNS, FCM, OneSignal
-- ✅ **Retry System**: Configurable with exponential backoff
-- ✅ **Asynchronous Sending**: Support with CompletableFuture
-- ✅ **Pub/Sub Pattern**: Events for notification tracking
-- ✅ **Extensible Architecture**: Easy to add new channels/providers
-- ✅ **SOLID Principles**: Clean and maintainable design
-- ✅ **Unit Tests**: Full coverage with JUnit 5 and Mockito
-
 ## Requirements
 
 - Java 21 or higher
