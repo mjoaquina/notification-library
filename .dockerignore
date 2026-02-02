@@ -1,0 +1,33 @@
+# Build output and caches
+target/
+!.mvn/
+.mvn/wrapper/maven-wrapper.jar
+
+# Version control and IDE
+.git/
+.gitignore
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Docs and non-runtime files (optional: remove if you want them in image)
+*.md
+docs/
+Agora*.pdf
+BUILDER_REFACTORING.md
+CODE_WALKTHROUGH.md
+COMPLIANCE_CHECKLIST.md
+LEGACY_CODE_REMOVAL.md
+ABSTRACTION_VERIFICATION.md
+requirements.txt
+setup-java21.sh
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Misc
+.DS_Store
