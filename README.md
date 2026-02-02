@@ -1,4 +1,4 @@
-# Notifications Library
+# Notification Library
 
 Java notification library, framework-agnostic and extensible. Supports multiple channels (Email, SMS, Push) with different providers, configurable retry system, asynchronous sending, and Pub/Sub pattern for events.
 
